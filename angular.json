@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "fluid-stuff": {
+    "fluid-background": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -41,7 +41,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/fluid-stuff",
+            "outputPath": "dist/fluid-background",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -89,14 +89,23 @@
           },
           "defaultConfiguration": "production"
         },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "fluid-stuff:build:production"
+              "browserTarget": "fluid-background:build:production"
             },
             "development": {
-              "browserTarget": "fluid-stuff:build:development"
+              "browserTarget": "fluid-background:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -104,10 +113,13 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "fluid-stuff:build"
+            "browserTarget": "fluid-background:build"
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

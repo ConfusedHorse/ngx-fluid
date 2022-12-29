@@ -4,6 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "lint": "ng lint",
+    "start:lint": "ng lint && ng serve --configuration development",
     "build": "ng build",
     "watch": "ng build --watch --configuration development"
   },
@@ -23,9 +25,19 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.0.4",
+    "@angular-eslint/builder": "15.1.0",
+    "@angular-eslint/eslint-plugin": "15.1.0",
+    "@angular-eslint/eslint-plugin-template": "15.1.0",
+    "@angular-eslint/template-parser": "15.1.0",
     "@angular/cli": "^15.0.4",
     "@angular/compiler-cli": "^15.0.4",
     "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "5.44.0",
+    "@typescript-eslint/parser": "5.44.0",
+    "eslint": "^8.28.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsdoc": "^39.6.4",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
     "typescript": "~4.8.4"
   }
 }

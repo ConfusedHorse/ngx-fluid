@@ -1,0 +1,14 @@
+{
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true,
+  "typescript.preferences.quoteStyle": "single",
+  "tslint.configFile": "tslint.json",
+  "files.watcherExclude": {
+    "**/artifacts/**": true,
+    "**/node_modules/**": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  }
+}

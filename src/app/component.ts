@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { tap } from 'rxjs';
-import mouseMove$ from '../common/mouse/mouseMove$';
+import { FluidBackgroundDirective } from '../common/fluidBackground/directive';
 
 @Component({
   standalone: true,
   imports: [
     CommonModule
+  ],
+  hostDirectives: [
+    FluidBackgroundDirective
   ],
   selector: 'app-root',
   templateUrl: './component.html',
@@ -16,10 +18,6 @@ export class AppComponent {
 
   constructor() {
     window.addEventListener('contextmenu', e => e.preventDefault());
-
-    mouseMove$().pipe(
-      tap(console.log)
-    ).subscribe();
   }
 
 }

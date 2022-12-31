@@ -42,7 +42,7 @@ export class FluidService {
 
     this._initialize();
 
-    this.multipleSplats(Math.random() * 20 + 5);
+    // this.multipleSplats(Math.random() * 20 + 5);
     requestAnimationFrame(this.update.bind(this));
   }
 
@@ -90,6 +90,7 @@ export class FluidService {
       const dx = 1000 * (Math.random() - .5);
       const dy = 1000 * (Math.random() - .5);
 
+      console.log({ x, y, dx, dy, color });
       this.splat(x, y, dx, dy, color);
     }
   }

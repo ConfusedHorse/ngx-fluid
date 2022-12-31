@@ -26,7 +26,7 @@ export class FluidBackgroundDirective extends CanvasBackgroundDirective {
   }
 
   private _randomSplat(): void {
-    const force = 500;
+    const force = 1500;
     const dx = Math.random() * 2 * force - force;
     const dy = Math.random() * 2 * force - force;
     this._fluidService.splat(.5, .5, dx, dy, { r: 0, g: 1, b: 1.5 });

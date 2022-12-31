@@ -1,4 +1,4 @@
-import { createProgram, getUniforms, UniformsMap } from './model';
+import { createProgram, getUniforms, UniformsIndex } from './model';
 import { compileShader } from './shaders';
 import { DISPLAY_SHADER_SOURCE } from './sources';
 
@@ -6,9 +6,9 @@ export class Material {
 
   private _programs: WebGLProgram[] = [];
   private _activeProgram!: WebGLProgram;
-  private _uniforms: UniformsMap = new Map<string, WebGLUniformLocation>();
+  private _uniforms!: UniformsIndex;
 
-  public get uniforms(): UniformsMap {
+  public get uniforms(): UniformsIndex {
     return this._uniforms;
   }
 

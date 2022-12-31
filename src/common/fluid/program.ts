@@ -1,15 +1,15 @@
-import { createProgram, getUniforms, UniformsMap } from './model';
+import { createProgram, getUniforms, UniformsIndex } from './model';
 
 export class Program {
 
   private _program!: WebGLProgram;
-  private _uniforms!: UniformsMap;
+  private _uniforms!: UniformsIndex;
 
   public get program(): WebGLProgram {
     return this._program;
   }
 
-  public get uniforms(): UniformsMap {
+  public get uniforms(): UniformsIndex {
     return this._uniforms;
   }
 

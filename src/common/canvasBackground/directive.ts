@@ -39,6 +39,7 @@ export abstract class CanvasBackgroundDirective {
   private _initializeContext() {
     this._webGL2RenderingContext = this._canvas.getContext('webgl2', CONTEXT_PARAMS) as WebGL2RenderingContext;
     this._webGL2RenderingContext.getExtension('EXT_color_buffer_float');
+    // this._webGL2RenderingContext.getExtension('OES_texture_float_linear');
     this._webGL2RenderingContext.clearColor(0, 0, 0, 1);
   }
 }

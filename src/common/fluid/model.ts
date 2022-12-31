@@ -1,4 +1,5 @@
 import { InjectionToken } from '@angular/core';
+import { WeirdColor } from './color';
 import { Material } from './material';
 import { Program } from './program';
 
@@ -13,6 +14,8 @@ export interface FluidConfiguration {
   splatRadius: number;
   splatForce: number;
   shading: boolean;
+  transparent: boolean;
+  backColor: WeirdColor;
   bloom: boolean;
   bloomIterations: number;
   bloomResolution: number;
@@ -79,9 +82,9 @@ export interface SupportedFormat {
 }
 
 export interface ExternalFormat {
-  formatRGBA: SupportedFormat | null;
-  formatRG: SupportedFormat | null;
-  formatR: SupportedFormat | null;
+  formatRGBA: SupportedFormat;
+  formatRG: SupportedFormat;
+  formatR: SupportedFormat;
 }
 
 export const INJECT_FLUID_CONFIGURATION = new InjectionToken<Partial<FluidConfiguration>>('INJECT_FLUID_CONFIGURATION');
@@ -90,9 +93,9 @@ export function getExternalFormat(renderingContext: WebGL2RenderingContext): Ext
   const { RGBA16F, RGBA, RG16F, RG, R16F, RED, HALF_FLOAT } = renderingContext;
 
   return {
-    formatRGBA: _getSupportedFormat(renderingContext, RGBA16F, RGBA, HALF_FLOAT),
-    formatRG: _getSupportedFormat(renderingContext, RG16F, RG, HALF_FLOAT),
-    formatR: _getSupportedFormat(renderingContext, R16F, RED, HALF_FLOAT)
+    formatRGBA: _getSupportedFormat(renderingContext, RGBA16F, RGBA, HALF_FLOAT) as SupportedFormat,
+    formatRG: _getSupportedFormat(renderingContext, RG16F, RG, HALF_FLOAT) as SupportedFormat,
+    formatR: _getSupportedFormat(renderingContext, R16F, RED, HALF_FLOAT) as SupportedFormat
   };
 }
 
@@ -104,7 +107,7 @@ export function createProgram(renderingContext: WebGL2RenderingContext, vertexSh
   renderingContext.linkProgram(program);
 
   if (!renderingContext.getProgramParameter(program, renderingContext.LINK_STATUS)) {
-    console.log(renderingContext.getProgramInfoLog(program));
+    console.error(renderingContext.getProgramInfoLog(program));
   }
 
   return program;
@@ -177,10 +180,12 @@ export const DEFAULT_FLUID_CONFIGURATION: FluidConfiguration = {
   velocityDissipation: 0,
   pressure: 0,
   pressureIterations: 20,
-  curl: 30, // 0?
+  curl: 0, // 0?
   splatRadius: .25,
   splatForce: 6000,
   shading: true,
+  backColor: { r: 0, g: 0, b: 0 },
+  transparent: false,
   bloom: true,
   bloomIterations: 8,
   bloomResolution: 256,

@@ -1,4 +1,4 @@
-import { Directive, inject } from '@angular/core';
+import { Directive, HostListener, inject } from '@angular/core';
 import { CanvasBackgroundDirective } from '../canvasBackground/directive';
 import { FluidService } from '../fluid/service';
 
@@ -14,6 +14,10 @@ export class FluidBackgroundDirective extends CanvasBackgroundDirective {
     super();
 
     this._fluidService.bind(this._renderingContext);
+  }
+
+  @HostListener('click') test() {
+    this._fluidService.multipleSplats(10);
   }
 
 }

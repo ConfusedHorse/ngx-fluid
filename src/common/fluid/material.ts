@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import { createProgram, getUniforms, UniformsMap } from './model';
 import { compileShader } from './shaders';
 import { DISPLAY_SHADER_SOURCE } from './sources';
@@ -53,7 +52,9 @@ export class Material {
 
     let hash = 0;
     for (let i = 0; i < keyword.length; i++) {
+        // eslint-disable-next-line no-bitwise
         hash = (hash << 5) - hash + keyword.charCodeAt(i);
+        // eslint-disable-next-line no-bitwise
         hash |= 0; // Convert to 32bit integer
     }
 

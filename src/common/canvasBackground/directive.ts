@@ -23,14 +23,10 @@ export abstract class CanvasBackgroundDirective {
     this._canvas = document.createElement('canvas');
 
     this._canvas.style.setProperty('position', 'absolute');
-    this._canvas.style.setProperty('width', '100vw');
-    this._canvas.style.setProperty('height', '100vh');
+    this._canvas.style.setProperty('width', '100%');
+    this._canvas.style.setProperty('height', '100%');
 
     this._elementRef.nativeElement.appendChild(this._canvas);
-
-    // observeResize$(this._canvas).pipe(
-    //   tap() //idk
-    // )
   }
 
   /**
@@ -39,7 +35,6 @@ export abstract class CanvasBackgroundDirective {
   private _initializeContext() {
     this._webGL2RenderingContext = this._canvas.getContext('webgl2', CONTEXT_PARAMS) as WebGL2RenderingContext;
     this._webGL2RenderingContext.getExtension('EXT_color_buffer_float');
-    // this._webGL2RenderingContext.getExtension('OES_texture_float_linear');
     this._webGL2RenderingContext.clearColor(0, 0, 0, 1);
   }
 }

@@ -1,10 +1,10 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { scaleByPixelRatio } from '../resize/model';
-import { getRandomColor, normalizeColor, WeirdColor } from './color';
+import { normalizeColor, WeirdColor } from './color';
 import configuration from './configuration';
 import { DoubleFrameBuffer, FrameBuffer } from './frameBuffer';
 import { Material } from './material';
-import { CompiledShaders, createMaterial, createPrograms, Dimensions, ExternalFormat, FluidConfiguration, getExternalFormat, getResolution, INJECT_FLUID_CONFIGURATION, Programs } from './model';
+import { CompiledShaders, createMaterial, createPrograms, Dimensions, ExternalFormat, FluidConfiguration, getExternalFormat, getResolution, INJECT_FLUID_CONFIGURATION, Programs, TexMovement } from './model';
 import { compileShaders } from './shaders';
 import { DitheringTexture } from './texture';
 
@@ -60,6 +60,14 @@ export class FluidService {
     requestAnimationFrame(this.update.bind(this));
   }
 
+  public splatMovement(texMovement: TexMovement, color: WeirdColor): void {
+    const { splatForce } = this._configuration;
+
+    const dx = texMovement.deltaX * splatForce;
+    const dy = texMovement.deltaY * splatForce;
+    this.splat(texMovement.x, texMovement.y, dx, dy, color);
+  }
+
   public splat(x: number, y: number, dx: number, dy: number, color: WeirdColor): void {
     const { splatProgram } = this._programs;
     const { canvas } = this._renderingContext;
@@ -79,25 +87,24 @@ export class FluidService {
     this._dye.swap();
   }
 
-  public multipleSplats(amount: number): void {
-    for (let i = 0; i < amount; i++) {
-      const color = getRandomColor();
-      color.r *= 10;
-      color.g *= 10;
-      color.b *= 10;
+  // public multipleSplats(amount: number): void {
+  //   for (let i = 0; i < amount; i++) {
+  //     const color = getRandomColor();
+  //     color.r *= 10;
+  //     color.g *= 10;
+  //     color.b *= 10;
 
-      const x = Math.random();
-      const y = Math.random();
-      const dx = 1000 * (Math.random() - .5);
-      const dy = 1000 * (Math.random() - .5);
+  //     const x = Math.random();
+  //     const y = Math.random();
+  //     const dx = 1000 * (Math.random() - .5);
+  //     const dy = 1000 * (Math.random() - .5);
 
-      console.log({ x, y, dx, dy, color });
-      this.splat(x, y, dx, dy, color);
-    }
-  }
+  //     console.log({ x, y, dx, dy, color });
+  //     this.splat(x, y, dx, dy, color);
+  //   }
+  // }
 
   private _initialize(): void {
-    // TODO something still doesn't work :(
     this._compiledShaders = compileShaders(this._renderingContext);
     this._programs = createPrograms(this._renderingContext, this._compiledShaders);
     this._displayMaterial = createMaterial(this._renderingContext, this._compiledShaders.baseVertexShader);
@@ -108,12 +115,6 @@ export class FluidService {
     this._updatekeywords();
     this._initFramebuffers();
   }
-
-  private _splatPointer(pointerEvent: PointerEvent) {
-    // const dx = pointerEvent.movementX * this._configuration.splatForce;
-    // const dy = pointerEvent.movementY * this._configuration.splatForce;
-    // splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color);
-}
 
   private _updatekeywords(): void {
     const { shading, bloom, sunrays } = this._configuration;
@@ -266,7 +267,7 @@ export class FluidService {
     }
 
     if (target === null && this._configuration.transparent) {
-      this._drawCheckerboard(target); // meh?
+      // this._drawCheckerboard(target); // meh?
     }
 
     this._drawDisplay(target);

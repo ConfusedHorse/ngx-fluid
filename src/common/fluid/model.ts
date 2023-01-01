@@ -89,6 +89,45 @@ export interface ExternalFormat {
   formatR: SupportedFormat;
 }
 
+export interface SplatParameters {
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
+  color: WeirdColor;
+}
+export interface TexCoordinates {
+  x: number;
+  y: number;
+}
+
+export interface TexMovement extends TexCoordinates {
+  deltaX: number;
+  deltaY: number;
+}
+
+export function correctDeltaX(delta: number, dimensions: Dimensions) {
+  const { width, height } = dimensions;
+
+  const aspectRatio = width / height;
+  if (aspectRatio < 1) {
+    delta *= aspectRatio;
+  }
+
+  return delta;
+}
+
+export function correctDeltaY(delta: number, dimensions: Dimensions) {
+  const { width, height } = dimensions;
+
+  const aspectRatio = width / height;
+  if (aspectRatio > 1) {
+    delta /= aspectRatio;
+  }
+
+  return delta;
+}
+
 export const INJECT_FLUID_CONFIGURATION = new InjectionToken<Partial<FluidConfiguration>>('INJECT_FLUID_CONFIGURATION');
 
 export function getExternalFormat(renderingContext: WebGL2RenderingContext): ExternalFormat {

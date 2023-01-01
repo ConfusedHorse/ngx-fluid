@@ -29,7 +29,7 @@ export class FluidBackgroundDirective extends CanvasBackgroundDirective implemen
     const canvas = this._renderingContext.canvas;
 
     fromEvent<MouseEvent>(canvas, 'mousemove').pipe(
-      throttleTime(25, asyncScheduler, { leading: true, trailing: true }),
+      throttleTime(15, asyncScheduler, { leading: true, trailing: true }),
       map(({ clientX, clientY }) => ({
         x: scaleByPixelRatio(clientX) / canvas.width,
         y: scaleByPixelRatio(clientY) / canvas.height
@@ -42,7 +42,7 @@ export class FluidBackgroundDirective extends CanvasBackgroundDirective implemen
         deltaY: correctDeltaY(previous.y - current.y, canvas)
       })),
       filter(texMovement => Math.abs(texMovement.deltaX) > 0 || Math.abs(texMovement.deltaY) > 0),
-      tap(texMovement => this._fluidService.splatMovement(texMovement, { r: 0, g: .25, b: 1 })),
+      tap(texMovement => this._fluidService.splatMovement(texMovement, { r: .1, g: .1, b: .5 })),
       this._untilDestroyed
     ).subscribe();
   }

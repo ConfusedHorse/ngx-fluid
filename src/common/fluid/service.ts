@@ -156,10 +156,7 @@ export class FluidService {
     this._curl = new FrameBuffer(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
     this._pressure = new DoubleFrameBuffer(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
 
-    this._sunrays = new FrameBuffer(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
-    this._sunraysTemp = new FrameBuffer(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
-
-    this._bloom = new FrameBuffer(this._renderingContext, bloomRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, NEAREST);
+    this._bloom = new FrameBuffer(this._renderingContext, bloomRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
     this._blooms = [];
     for (let i = 0; i < bloomIterations; i++) {
       let { width, height } = bloomRes;
@@ -172,8 +169,11 @@ export class FluidService {
         break;
       }
 
-      const bloom = new FrameBuffer(this._renderingContext, { width, height }, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, NEAREST);
+      const bloom = new FrameBuffer(this._renderingContext, { width, height }, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
       this._blooms.push(bloom);
+
+      this._sunrays = new FrameBuffer(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
+      this._sunraysTemp = new FrameBuffer(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
     }
   }
 

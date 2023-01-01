@@ -13,7 +13,7 @@ export default {
   shading: true,
   backColor: { r: 0, g: 0, b: 0 },
   transparent: true,
-  bloom: true,
+  bloom: false,
   bloomIterations: 8,
   bloomResolution: 256,
   bloomIntensity: .1,

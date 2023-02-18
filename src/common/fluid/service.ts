@@ -1,57 +1,59 @@
-import { Inject, Injectable, Optional } from '@angular/core';
-import { scaleByPixelRatio } from '../resize/model';
-import { normalizeColor, WeirdColor } from './color';
-import configuration from './configuration';
-import { DoubleFrameBuffer, FrameBuffer } from './frameBuffer';
-import { Material } from './material';
-import { CompiledShaders, createMaterial, createPrograms, Dimensions, ExternalFormat, FluidConfiguration, getExternalFormat, getResolution, INJECT_FLUID_CONFIGURATION, Programs, TexMovement } from './model';
-import { compileShaders } from './shaders';
-import { DitheringTexture } from './texture';
+import { inject, Injectable } from '@angular/core';
+import { DoubleFrameBufferEntity, FrameBufferEntity } from './entities/frameBuffer';
+import { MaterialEntity } from './entities/material';
+import { DitheringTextureEntity } from './entities/texture';
+import { getExternalFormat, normalizeColor } from './helpers/color';
+import { getResolution, getTextureScale, resizeCanvas } from './helpers/dimension';
+import { createMaterial } from './helpers/material';
+import { createPrograms } from './helpers/program';
+import { ExternalFormat, Rgb } from './model/color';
+import { DEFAULT_CONFIGURATION, FluidConfiguration, INJECT_FLUID_CONFIGURATION } from './model/configuration';
+import { Dimension, TexMovement } from './model/dimension';
+import { Programs } from './model/program';
+import { CompiledShaders } from './model/shaders';
+import { compileShaders } from './shaders/shaders';
 
 @Injectable()
 export class FluidService {
 
   private _renderingContext!: WebGL2RenderingContext;
-  private _configuration: FluidConfiguration;
+  private readonly _configuration: FluidConfiguration = { ...DEFAULT_CONFIGURATION, ...inject(INJECT_FLUID_CONFIGURATION, { optional: true }) };
 
   private _compiledShaders!: CompiledShaders;
   private _programs!: Programs;
-  private _displayMaterial!: Material;
+  private _displayMaterial!: MaterialEntity;
   private _externalFormat!: ExternalFormat;
 
-  private _dye!: DoubleFrameBuffer;
-  private _velocity!: DoubleFrameBuffer;
-  private _divergence!: FrameBuffer;
-  private _curl!: FrameBuffer;
-  private _pressure!: DoubleFrameBuffer;
-  private _bloom!: FrameBuffer;
-  private _blooms!: FrameBuffer[];
-  private _sunrays!: FrameBuffer;
-  private _sunraysTemp!: FrameBuffer;
+  private _dye!: DoubleFrameBufferEntity;
+  private _velocity!: DoubleFrameBufferEntity;
+  private _divergence!: FrameBufferEntity;
+  private _curl!: FrameBufferEntity;
+  private _pressure!: DoubleFrameBufferEntity;
+  private _bloom!: FrameBufferEntity;
+  private _blooms!: FrameBufferEntity[];
+  private _sunrays!: FrameBufferEntity;
+  private _sunraysTemp!: FrameBufferEntity;
 
-  private _ditheringTexture!: DitheringTexture;
+  private _ditheringTexture!: DitheringTextureEntity;
 
   private _lastUpdateTime = Date.now();
 
-  constructor(@Optional() @Inject(INJECT_FLUID_CONFIGURATION) customConfiguration: Partial<FluidConfiguration>) {
-    this._configuration = { ...configuration, ...customConfiguration };
-  }
-
   public bind(renderingContext: WebGL2RenderingContext) {
+    if (this._renderingContext) {
+      throw Error('rendering context has already been set!');
+    }
+
     this._renderingContext = renderingContext;
     this._externalFormat = getExternalFormat(renderingContext);
 
     this._initialize();
-
-    // this.multipleSplats(Math.random() * 20 + 5);
-    requestAnimationFrame(this.update.bind(this));
   }
 
   public update(): void {
     // TODO this should be handled by an observable
     const delta = this._calcDeltaTime();
 
-    if (this._resizeCanvas()) {
+    if (resizeCanvas(this._renderingContext.canvas)) {
       this._initFramebuffers();
     }
 
@@ -60,7 +62,7 @@ export class FluidService {
     requestAnimationFrame(this.update.bind(this));
   }
 
-  public splatMovement(texMovement: TexMovement, color: WeirdColor): void {
+  public splatMovement(texMovement: TexMovement, color: Rgb): void {
     const { splatForce } = this._configuration;
 
     const dx = texMovement.deltaX * splatForce;
@@ -68,7 +70,7 @@ export class FluidService {
     this.splat(texMovement.x, texMovement.y, dx, dy, color);
   }
 
-  public splat(x: number, y: number, dx: number, dy: number, color: WeirdColor): void {
+  public splat(x: number, y: number, dx: number, dy: number, color: Rgb): void {
     const { splatProgram } = this._programs;
     const { canvas } = this._renderingContext;
 
@@ -87,23 +89,6 @@ export class FluidService {
     this._dye.swap();
   }
 
-  // public multipleSplats(amount: number): void {
-  //   for (let i = 0; i < amount; i++) {
-  //     const color = getRandomColor();
-  //     color.r *= 10;
-  //     color.g *= 10;
-  //     color.b *= 10;
-
-  //     const x = Math.random();
-  //     const y = Math.random();
-  //     const dx = 1000 * (Math.random() - .5);
-  //     const dy = 1000 * (Math.random() - .5);
-
-  //     console.log({ x, y, dx, dy, color });
-  //     this.splat(x, y, dx, dy, color);
-  //   }
-  // }
-
   private _initialize(): void {
     this._compiledShaders = compileShaders(this._renderingContext);
     this._programs = createPrograms(this._renderingContext, this._compiledShaders);
@@ -111,9 +96,10 @@ export class FluidService {
 
     this._initializeBlit();
     this._initializeTexture();
-
     this._updatekeywords();
     this._initFramebuffers();
+
+    requestAnimationFrame(this.update.bind(this));
   }
 
   private _updatekeywords(): void {
@@ -147,17 +133,17 @@ export class FluidService {
 
     this._dye = this._dye
       ? this._resizeDoubleFBO(this._dye, dyeRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR)
-      : new DoubleFrameBuffer(this._renderingContext, dyeRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
+      : new DoubleFrameBufferEntity(this._renderingContext, dyeRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
 
     this._velocity = this._velocity
       ? this._resizeDoubleFBO(this._velocity, simRes, formatRG.internalFormat, formatRG.format, HALF_FLOAT, LINEAR)
-      : new DoubleFrameBuffer(this._renderingContext, simRes, formatRG.internalFormat, formatRG.format, HALF_FLOAT, LINEAR);
+      : new DoubleFrameBufferEntity(this._renderingContext, simRes, formatRG.internalFormat, formatRG.format, HALF_FLOAT, LINEAR);
 
-    this._divergence = new FrameBuffer(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
-    this._curl = new FrameBuffer(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
-    this._pressure = new DoubleFrameBuffer(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
+    this._divergence = new FrameBufferEntity(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
+    this._curl = new FrameBufferEntity(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
+    this._pressure = new DoubleFrameBufferEntity(this._renderingContext, simRes, formatR.internalFormat, formatR.format, HALF_FLOAT, NEAREST);
 
-    this._bloom = new FrameBuffer(this._renderingContext, bloomRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
+    this._bloom = new FrameBufferEntity(this._renderingContext, bloomRes, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
     this._blooms = [];
     for (let i = 0; i < bloomIterations; i++) {
       let { width, height } = bloomRes;
@@ -170,11 +156,11 @@ export class FluidService {
         break;
       }
 
-      const bloom = new FrameBuffer(this._renderingContext, { width, height }, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
+      const bloom = new FrameBufferEntity(this._renderingContext, { width, height }, formatRGBA.internalFormat, formatRGBA.format, HALF_FLOAT, LINEAR);
       this._blooms.push(bloom);
 
-      this._sunrays = new FrameBuffer(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
-      this._sunraysTemp = new FrameBuffer(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
+      this._sunrays = new FrameBufferEntity(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
+      this._sunraysTemp = new FrameBufferEntity(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
     }
   }
 
@@ -243,7 +229,7 @@ export class FluidService {
     this._dye.swap();
   }
 
-  private _render(target: FrameBuffer | null = null): void {
+  private _render(target: FrameBufferEntity | null = null): void {
     const { ONE, ONE_MINUS_SRC_ALPHA, BLEND } = this._renderingContext;
 
     if (this._configuration.bloom) {
@@ -273,7 +259,7 @@ export class FluidService {
     this._drawDisplay(target);
   }
 
-  private _applyBloom(source: FrameBuffer, destination: FrameBuffer): void {
+  private _applyBloom(source: FrameBufferEntity, destination: FrameBufferEntity): void {
     if (this._blooms.length < 2) {
       return;
     }
@@ -329,7 +315,7 @@ export class FluidService {
     this._blitFramebuffer(destination);
   }
 
-  private _applySunrays(source: FrameBuffer, mask: FrameBuffer, destination: FrameBuffer): void {
+  private _applySunrays(source: FrameBufferEntity, mask: FrameBufferEntity, destination: FrameBufferEntity): void {
     const { BLEND } = this._renderingContext;
     const { sunraysWeight } = this._configuration;
     const { sunraysMaskProgram, sunraysProgram } = this._programs;
@@ -345,7 +331,7 @@ export class FluidService {
     this._blitFramebuffer(destination);
   }
 
-  private _blur(target: FrameBuffer, temp: FrameBuffer, iterations: number): void {
+  private _blur(target: FrameBufferEntity, temp: FrameBufferEntity, iterations: number): void {
     const { blurProgram } = this._programs;
 
     blurProgram.bind();
@@ -360,7 +346,7 @@ export class FluidService {
     }
   }
 
-  private _drawColor(target: FrameBuffer | null, color: WeirdColor): void {
+  private _drawColor(target: FrameBufferEntity | null, color: Rgb): void {
     const { colorProgram } = this._programs;
 
     colorProgram.bind();
@@ -369,7 +355,7 @@ export class FluidService {
     this._blitFramebuffer(target);
   }
 
-  private _drawCheckerboard(target: FrameBuffer | null): void {
+  private _drawCheckerboard(target: FrameBufferEntity | null): void {
     const { checkerboardProgram } = this._programs;
     const { canvas } = this._renderingContext;
 
@@ -379,7 +365,7 @@ export class FluidService {
     this._blitFramebuffer(target);
   }
 
-  private _drawDisplay(target: FrameBuffer | null) {
+  private _drawDisplay(target: FrameBufferEntity | null) {
     const { drawingBufferWidth, drawingBufferHeight } = this._renderingContext;
     const { shading, bloom, sunrays } = this._configuration;
 
@@ -396,7 +382,7 @@ export class FluidService {
     if (bloom) {
       this._renderingContext.uniform1i(this._displayMaterial.uniforms['uBloom'], this._bloom.attach(1));
       this._renderingContext.uniform1i(this._displayMaterial.uniforms['uDithering'], this._ditheringTexture.attach(2));
-      const scale = this._getTextureScale(this._ditheringTexture, width, height);
+      const scale = getTextureScale(this._ditheringTexture, width, height);
       this._renderingContext.uniform2f(this._displayMaterial.uniforms['ditherScale'], scale.width, scale.height);
     }
 
@@ -407,9 +393,9 @@ export class FluidService {
     this._blitFramebuffer(target);
   }
 
-  private _resizeFBO(target: FrameBuffer, dimensions: Dimensions, internalFormat: number, format: number, type: number, param: number): FrameBuffer {
+  private _resizeFBO(target: FrameBufferEntity, dimensions: Dimension, internalFormat: number, format: number, type: number, param: number): FrameBufferEntity {
     const { copyProgram } = this._programs as Programs;
-    const newFBO = new FrameBuffer(this._renderingContext, dimensions, internalFormat, format, type, param);
+    const newFBO = new FrameBufferEntity(this._renderingContext, dimensions, internalFormat, format, type, param);
 
     copyProgram.bind();
     this._renderingContext.uniform1i(copyProgram.uniforms['uTexture'], target.attach(0));
@@ -418,18 +404,18 @@ export class FluidService {
     return newFBO;
   }
 
-  private _resizeDoubleFBO(target: DoubleFrameBuffer, dimensions: Dimensions, internalFormat: number, format: number, type: number, param: number): DoubleFrameBuffer {
+  private _resizeDoubleFBO(target: DoubleFrameBufferEntity, dimensions: Dimension, internalFormat: number, format: number, type: number, param: number): DoubleFrameBufferEntity {
     const { width, height } = dimensions;
     if (target.width === width && target.height === height) {
       return target;
     }
 
     target.read = this._resizeFBO(target.read, dimensions, internalFormat, format, type, param);
-    target.write = new FrameBuffer(this._renderingContext, dimensions, internalFormat, format, type, param);
+    target.write = new FrameBufferEntity(this._renderingContext, dimensions, internalFormat, format, type, param);
     return target;
   }
 
-  private _blitFramebuffer(target: FrameBuffer | null): void {
+  private _blitFramebuffer(target: FrameBufferEntity | null): void {
     const { FRAMEBUFFER, TRIANGLES, UNSIGNED_SHORT } = this._renderingContext;
 
     if (!target) {
@@ -454,30 +440,7 @@ export class FluidService {
   }
 
   private _initializeTexture(): void {
-    this._ditheringTexture = new DitheringTexture(this._renderingContext);
-  }
-
-  private _getTextureScale(ditheringTexture: DitheringTexture, width: number, height: number): Dimensions {
-    return {
-      width: width / ditheringTexture.width,
-      height: height / ditheringTexture.height
-    };
-  }
-
-  private _resizeCanvas(): boolean {
-    const canvas = this._renderingContext.canvas as HTMLCanvasElement;
-
-    const width = scaleByPixelRatio(canvas.clientWidth);
-    const height = scaleByPixelRatio(canvas.clientHeight);
-
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-
-      return true;
-    }
-
-    return false;
+    this._ditheringTexture = new DitheringTextureEntity(this._renderingContext);
   }
 
   private _correctRadius(radius: number): number {
@@ -495,7 +458,7 @@ export class FluidService {
     const now = Date.now();
 
     let delta = (now - this._lastUpdateTime) * .001;
-    delta = Math.min(delta, .016666);
+    delta = Math.min(delta, 1/60);
     this._lastUpdateTime = now;
 
     return delta;

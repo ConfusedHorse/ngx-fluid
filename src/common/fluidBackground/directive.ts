@@ -1,9 +1,9 @@
-import { Directive, HostListener, inject, OnInit } from '@angular/core';
-import { asyncScheduler, filter, fromEvent, map, pairwise, tap, throttleTime } from 'rxjs';
+import { Directive, inject, OnInit } from '@angular/core';
+import { filter, fromEvent, map, merge, mergeMap, pairwise, takeUntil, tap } from 'rxjs';
 import { CanvasBackgroundDirective } from '../canvasBackground/directive';
-import { correctDeltaX, correctDeltaY, TexCoordinates, TexMovement } from '../fluid/model';
+import { correctDeltaX, correctDeltaY, scaleByPixelRatio } from '../fluid/helpers/dimension';
+import { TexCoordinates, TexMovement } from '../fluid/model/dimension';
 import { FluidService } from '../fluid/service';
-import { scaleByPixelRatio } from '../resize/model';
 import untilDestroyed from '../untilDestroyed/untilDestroyed';
 
 @Directive({
@@ -12,15 +12,15 @@ import untilDestroyed from '../untilDestroyed/untilDestroyed';
 })
 export class FluidBackgroundDirective extends CanvasBackgroundDirective implements OnInit {
 
-  private _fluidService = inject(FluidService);
-  private _untilDestroyed = untilDestroyed();
+  private readonly _fluidService = inject(FluidService);
+  private readonly _untilDestroyed = untilDestroyed();
 
   constructor() {
     super();
 
     this._fluidService.bind(this._renderingContext);
 
-    // interval(1000).pipe(
+    // interval(100).pipe(
     //   tap(this._randomSplat.bind(this))
     // ).subscribe();
   }
@@ -28,8 +28,16 @@ export class FluidBackgroundDirective extends CanvasBackgroundDirective implemen
   ngOnInit(): void {
     const canvas = this._renderingContext.canvas;
 
-    fromEvent<MouseEvent>(canvas, 'mousemove').pipe(
-      throttleTime(15, asyncScheduler, { leading: true, trailing: true }),
+    const dragMove$ = fromEvent<MouseEvent>(canvas, 'mousedown').pipe(
+      mergeMap(_ => fromEvent<MouseEvent>(canvas, 'mousemove').pipe(
+        takeUntil(merge(
+          fromEvent<MouseEvent>(canvas, 'mouseup'),
+          fromEvent<MouseEvent>(canvas, 'mouseleave'),
+        )))
+      )
+    );
+
+    dragMove$.pipe(
       map(({ clientX, clientY }) => ({
         x: scaleByPixelRatio(clientX) / canvas.width,
         y: scaleByPixelRatio(clientY) / canvas.height
@@ -42,20 +50,21 @@ export class FluidBackgroundDirective extends CanvasBackgroundDirective implemen
         deltaY: correctDeltaY(previous.y - current.y, canvas)
       })),
       filter(texMovement => Math.abs(texMovement.deltaX) > 0 || Math.abs(texMovement.deltaY) > 0),
-      tap(texMovement => this._fluidService.splatMovement(texMovement, { r: .1, g: .1, b: .5 })),
+      tap<any>(texMovement => this._fluidService.splatMovement(texMovement, { r: .1, g: .1, b: .5 })),
       this._untilDestroyed
     ).subscribe();
   }
 
-  @HostListener('click') test() {
-    // this._fluidService.multipleSplats(Math.random() * 20 + 5);
-  }
+  // private _randomSplat(): void {
+  //   const force = 1500;
+  //   const dx = Math.random() * 2 * force - force;
+  //   const dy = Math.random() * 2 * force - force;
 
-  private _randomSplat(): void {
-    const force = 1500;
-    const dx = Math.random() * 2 * force - force;
-    const dy = Math.random() * 2 * force - force;
-    this._fluidService.splat(.5, .5, dx, dy, { r: 0, g: 1, b: 1 });
-  }
+  //   const color = getRandomColor(1);
+  //   color.r *= 10;
+  //   color.g *= 10;
+  //   color.b *= 10;
+  //   this._fluidService.splat(.5, .5, dx, dy, color);
+  // }
 
 }

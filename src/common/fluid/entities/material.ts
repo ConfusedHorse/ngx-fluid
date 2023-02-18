@@ -1,7 +1,7 @@
 import { createProgram } from '../helpers/program';
+import { compileShader } from '../helpers/shaders';
 import { getUniforms } from '../helpers/uniforms';
 import { UniformsIndex } from '../model/uniforms';
-import { compileShader } from '../shaders/shaders';
 import { DISPLAY_SHADER_SOURCE } from '../shaders/sources';
 
 export class MaterialEntity {

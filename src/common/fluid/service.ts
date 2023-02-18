@@ -6,12 +6,12 @@ import { getExternalFormat, normalizeColor } from './helpers/color';
 import { getResolution, getTextureScale, resizeCanvas } from './helpers/dimension';
 import { createMaterial } from './helpers/material';
 import { createPrograms } from './helpers/program';
+import { compileShaders } from './helpers/shaders';
 import { ExternalFormat, Rgb } from './model/color';
 import { Configuration, FluidConfiguration } from './model/configuration';
 import { Dimension, TexMovement } from './model/dimension';
 import { Programs } from './model/program';
 import { CompiledShaders } from './model/shaders';
-import { compileShaders } from './shaders/shaders';
 
 @Injectable()
 export class FluidService {

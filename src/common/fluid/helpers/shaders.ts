@@ -19,7 +19,7 @@ import {
   SUNRAYS_MASK_SHADER_SOURCE,
   SUNRAYS_SHADER_SOURCE,
   VORTICITY_SHADER_SOURCE
-} from './sources';
+} from '../shaders/sources';
 
 export function compileShaders(renderingContext: WebGL2RenderingContext): CompiledShaders {
   return {

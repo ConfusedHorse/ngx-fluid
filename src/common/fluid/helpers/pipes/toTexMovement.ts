@@ -2,8 +2,10 @@ import { filter, map, OperatorFunction, pairwise, pipe } from 'rxjs';
 import { TexCoordinates, TexMovement } from '../../model/dimension';
 import { correctDeltaX, correctDeltaY, scaleByPixelRatio } from '../dimension';
 
-export default (canvas: HTMLCanvasElement | OffscreenCanvas): OperatorFunction<MouseEvent, TexMovement> => pipe(
-  map<MouseEvent, TexCoordinates>(({ clientX, clientY }: MouseEvent) => ({
+type InteractionCoordinates = Pick<MouseEvent, 'clientX' | 'clientY'>;
+
+export default (canvas: HTMLCanvasElement | OffscreenCanvas): OperatorFunction<InteractionCoordinates, TexMovement> => pipe(
+  map<InteractionCoordinates, TexCoordinates>(({ clientX, clientY }: InteractionCoordinates) => ({
     x: scaleByPixelRatio(clientX) / canvas.width,
     y: scaleByPixelRatio(clientY) / canvas.height
   })),

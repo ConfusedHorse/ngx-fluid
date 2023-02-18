@@ -25,6 +25,7 @@ export abstract class CanvasBackgroundDirective {
     this._canvas.style.setProperty('position', 'absolute');
     this._canvas.style.setProperty('width', '100%');
     this._canvas.style.setProperty('height', '100%');
+    this._canvas.style.setProperty('z-index', '-1');
 
     this._elementRef.nativeElement.appendChild(this._canvas);
   }

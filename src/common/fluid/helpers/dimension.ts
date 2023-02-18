@@ -23,46 +23,16 @@ export function correctDeltaY(delta: number, dimensions: Dimension) {
   return delta;
 }
 
-// export function getResolution(renderingContext: WebGL2RenderingContext, resolution: number): Dimension {
-//   // TODO optimize this
+export function getResolution(renderingContext: WebGL2RenderingContext, resolution: number): Dimension {
+  const { drawingBufferWidth, drawingBufferHeight } = renderingContext;
+  const aspectRatio = drawingBufferWidth / drawingBufferHeight;
+  const min = resolution;
+  const max = resolution * aspectRatio;
 
-//   const { drawingBufferWidth, drawingBufferHeight } = renderingContext;
-//   let aspectRatio = drawingBufferWidth / drawingBufferHeight;
-//   if (aspectRatio < 1) {
-//     aspectRatio = 1 / aspectRatio;
-//   }
-
-//   const min = Math.round(resolution);
-//   const max = Math.round(resolution * aspectRatio);
-
-//   return drawingBufferWidth > drawingBufferHeight
-//     ? { width: max, height: min }
-//     : { width: min, height: max };
-// }
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const getResolution = (() => {
-  const cache = new Map<string, Dimension>();
-  return (renderingContext: WebGL2RenderingContext, resolution: number): Dimension => {
-    const { drawingBufferWidth, drawingBufferHeight } = renderingContext;
-    const key = `${drawingBufferWidth},${drawingBufferHeight},${resolution}`;
-    if (cache.has(key)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return cache.get(key)!;
-    }
-
-    const min = resolution;
-    const aspectRatio = Math.max(drawingBufferWidth / drawingBufferHeight, 1 / (drawingBufferWidth / drawingBufferHeight));
-    const max = min * aspectRatio;
-
-    const result = drawingBufferWidth > drawingBufferHeight
-      ? { width: Math.floor(max), height: Math.floor(min) }
-      : { width: Math.floor(min), height: Math.floor(max) };
-
-    cache.set(key, result);
-    return result;
-  };
-})();
+  return drawingBufferWidth > drawingBufferHeight
+    ? { width: Math.floor(max), height: Math.floor(min) }
+    : { width: Math.floor(min), height: Math.floor(max) };
+}
 
 export function getTextureScale(ditheringTexture: DitheringTextureEntity, width: number, height: number): Dimension {
   return {

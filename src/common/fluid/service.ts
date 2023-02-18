@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { DoubleFrameBufferEntity, FrameBufferEntity } from './entities/frameBuffer';
 import { MaterialEntity } from './entities/material';
 import { DitheringTextureEntity } from './entities/texture';
@@ -7,7 +7,7 @@ import { getResolution, getTextureScale, resizeCanvas } from './helpers/dimensio
 import { createMaterial } from './helpers/material';
 import { createPrograms } from './helpers/program';
 import { ExternalFormat, Rgb } from './model/color';
-import { DEFAULT_CONFIGURATION, FluidConfiguration, INJECT_FLUID_CONFIGURATION } from './model/configuration';
+import { Configuration, FluidConfiguration } from './model/configuration';
 import { Dimension, TexMovement } from './model/dimension';
 import { Programs } from './model/program';
 import { CompiledShaders } from './model/shaders';
@@ -17,7 +17,7 @@ import { compileShaders } from './shaders/shaders';
 export class FluidService {
 
   private _renderingContext!: WebGL2RenderingContext;
-  private readonly _configuration: FluidConfiguration = { ...DEFAULT_CONFIGURATION, ...inject(INJECT_FLUID_CONFIGURATION, { optional: true }) };
+  private readonly _configuration: FluidConfiguration = Configuration();
 
   private _compiledShaders!: CompiledShaders;
   private _programs!: Programs;
@@ -49,19 +49,6 @@ export class FluidService {
     this._initialize();
   }
 
-  public update(): void {
-    // TODO this should be handled by an observable
-    const delta = this._calcDeltaTime();
-
-    if (resizeCanvas(this._renderingContext.canvas)) {
-      this._initFramebuffers();
-    }
-
-    this._step(delta);
-    this._render(null);
-    requestAnimationFrame(this.update.bind(this));
-  }
-
   public splatMovement(texMovement: TexMovement, color: Rgb): void {
     const { splatForce } = this._configuration;
 
@@ -71,6 +58,10 @@ export class FluidService {
   }
 
   public splat(x: number, y: number, dx: number, dy: number, color: Rgb): void {
+    if (!this._renderingContext) {
+      throw Error('rendering context has not been set! Use bind() to provide a rendering context.');
+    }
+
     const { splatProgram } = this._programs;
     const { canvas } = this._renderingContext;
 
@@ -99,7 +90,7 @@ export class FluidService {
     this._updatekeywords();
     this._initFramebuffers();
 
-    requestAnimationFrame(this.update.bind(this));
+    requestAnimationFrame(this._update.bind(this));
   }
 
   private _updatekeywords(): void {
@@ -162,6 +153,18 @@ export class FluidService {
       this._sunrays = new FrameBufferEntity(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
       this._sunraysTemp = new FrameBufferEntity(this._renderingContext, sunRaysRes, formatR.internalFormat, formatR.format, HALF_FLOAT, LINEAR);
     }
+  }
+
+  private _update(): void {
+    const delta = this._calcDeltaTime();
+
+    if (resizeCanvas(this._renderingContext.canvas)) {
+      this._initFramebuffers();
+    }
+
+    this._step(delta);
+    this._render(null);
+    requestAnimationFrame(this._update.bind(this));
   }
 
   private _step(deltaTime: number): void {

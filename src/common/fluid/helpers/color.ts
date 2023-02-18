@@ -1,5 +1,9 @@
 import { ExternalFormat, Rgb, SupportedFormat } from '../model/color';
 
+export function rgb(r: number, g: number, b: number): Rgb {
+  return { r, g, b };
+}
+
 export function getRandomColor(dim: number = .15) {
   const color = _hsvtoRgb(Math.random(), 1, 1);
   color.r *= dim;

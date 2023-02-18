@@ -1,4 +1,4 @@
-import { InjectionToken } from '@angular/core';
+import { inject, InjectionToken } from '@angular/core';
 import { Rgb } from './color';
 
 export interface FluidConfiguration {
@@ -25,8 +25,6 @@ export interface FluidConfiguration {
   sunraysWeight: number;
 }
 
-export const INJECT_FLUID_CONFIGURATION = new InjectionToken<Partial<FluidConfiguration>>('INJECT_FLUID_CONFIGURATION');
-
 export const DEFAULT_CONFIGURATION: FluidConfiguration = {
   simResolution: 256,
   dyeResolution: 1024,
@@ -39,8 +37,8 @@ export const DEFAULT_CONFIGURATION: FluidConfiguration = {
   splatForce: 6000,
   shading: true,
   backColor: { r: 0, g: 0, b: 0 },
-  transparent: true,
-  bloom: true,
+  transparent: false,
+  bloom: false,
   bloomIterations: 8,
   bloomResolution: 256,
   bloomIntensity: .1,
@@ -50,3 +48,7 @@ export const DEFAULT_CONFIGURATION: FluidConfiguration = {
   sunraysResolution: 196,
   sunraysWeight: 1
 };
+
+export const INJECT_FLUID_CONFIGURATION = new InjectionToken<Partial<FluidConfiguration>>('INJECT_FLUID_CONFIGURATION');
+
+export const Configuration = () => ({ ...DEFAULT_CONFIGURATION, ...inject(INJECT_FLUID_CONFIGURATION, { optional: true }) });

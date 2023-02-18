@@ -38,6 +38,10 @@ export class FluidService {
 
   private _lastUpdateTime = Date.now();
 
+  public get canvas(): HTMLCanvasElement | OffscreenCanvas {
+    return this._renderingContext.canvas;
+  }
+
   public bind(renderingContext: WebGL2RenderingContext) {
     if (this._renderingContext) {
       throw Error('rendering context has already been set!');
@@ -63,7 +67,7 @@ export class FluidService {
     }
 
     const { splatProgram } = this._programs;
-    const { canvas } = this._renderingContext;
+    const { canvas } = this;
 
     splatProgram.bind();
     this._renderingContext.uniform1i(splatProgram.uniforms['uTarget'], this._velocity.read.attach(0));
@@ -158,7 +162,7 @@ export class FluidService {
   private _update(): void {
     const delta = this._calcDeltaTime();
 
-    if (resizeCanvas(this._renderingContext.canvas)) {
+    if (resizeCanvas(this.canvas)) {
       this._initFramebuffers();
     }
 
@@ -360,7 +364,7 @@ export class FluidService {
 
   private _drawCheckerboard(target: FrameBufferEntity | null): void {
     const { checkerboardProgram } = this._programs;
-    const { canvas } = this._renderingContext;
+    const { canvas } = this;
 
     checkerboardProgram.bind();
     this._renderingContext.uniform1f(checkerboardProgram.uniforms['aspectRatio'], canvas.width / canvas.height);
@@ -447,7 +451,7 @@ export class FluidService {
   }
 
   private _correctRadius(radius: number): number {
-    const { canvas } = this._renderingContext;
+    const { canvas } = this;
     const aspectRatio = canvas.width / canvas.height;
 
     if (aspectRatio > 1) {

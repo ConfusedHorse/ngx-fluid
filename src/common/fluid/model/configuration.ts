@@ -1,30 +1,6 @@
 import { inject, InjectionToken } from '@angular/core';
 import { Rgb } from './color';
 
-export interface FluidConfiguration {
-  simResolution: number;
-  dyeResolution: number;
-  densityDissipation: number;
-  velocityDissipation: number;
-  pressure: number;
-  pressureIterations: number;
-  curl: number;
-  splatRadius: number;
-  splatForce: number;
-  shading: boolean;
-  transparent: boolean;
-  backColor: Rgb;
-  bloom: boolean;
-  bloomIterations: number;
-  bloomResolution: number;
-  bloomIntensity: number;
-  bloomThreshold: number;
-  bloomSoftKnee: number;
-  sunrays: boolean;
-  sunraysResolution: number;
-  sunraysWeight: number;
-}
-
 export const DEFAULT_CONFIGURATION: FluidConfiguration = {
   simResolution: 256,
   dyeResolution: 1024,
@@ -48,6 +24,30 @@ export const DEFAULT_CONFIGURATION: FluidConfiguration = {
   sunraysResolution: 196,
   sunraysWeight: 1
 };
+
+export interface FluidConfiguration {
+  simResolution: number;
+  dyeResolution: number;
+  densityDissipation: number;
+  velocityDissipation: number;
+  pressure: number;
+  pressureIterations: number;
+  curl: number;
+  splatRadius: number;
+  splatForce: number;
+  shading: boolean;
+  transparent: boolean;
+  backColor: Rgb;
+  bloom: boolean;
+  bloomIterations: number;
+  bloomResolution: number;
+  bloomIntensity: number;
+  bloomThreshold: number;
+  bloomSoftKnee: number;
+  sunrays: boolean;
+  sunraysResolution: number;
+  sunraysWeight: number;
+}
 
 export const INJECT_FLUID_CONFIGURATION = new InjectionToken<Partial<FluidConfiguration>>('INJECT_FLUID_CONFIGURATION');
 

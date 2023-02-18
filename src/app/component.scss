@@ -6,5 +6,23 @@
   justify-content: center;
   align-items: center;
 
-  color: white;
+  color: gray;
+
+  > .content {
+    width: 80vw;
+    height: 80vh;
+    padding: 50px;
+
+    backdrop-filter: blur(20px);
+    background-color: rgba(0, 0, 0, 0.75);
+    border: solid 1px white;
+
+    font-size: 25px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    &::selection {
+      background-color: transparent;
+      color: white
+    }
+  }
 }

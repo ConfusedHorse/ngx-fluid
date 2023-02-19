@@ -1,7 +1,7 @@
 import { ExternalFormat, Rgb, SupportedFormat } from '../model/color';
 
 export function rgb(r: number, g: number, b: number): Rgb {
-  return { r, g, b };
+  return normalizeColor({ r, g, b });
 }
 
 export function getRandomColor(dim: number = .15) {

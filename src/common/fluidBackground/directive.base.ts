@@ -3,12 +3,11 @@ import { CanvasBackgroundDirective } from '../canvasBackground/directive';
 import { FluidService } from '../fluid/service';
 
 @Directive({
-  standalone: true,
-  providers: [FluidService]
+  standalone: true
 })
-export class FluidBackgroundDirective extends CanvasBackgroundDirective {
+export abstract class FluidBackgroundDirective extends CanvasBackgroundDirective {
 
-  private readonly _fluidService = inject(FluidService);
+  protected readonly _fluidService = inject(FluidService);
 
   constructor() {
     super();

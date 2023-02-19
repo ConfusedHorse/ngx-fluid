@@ -6,9 +6,9 @@ import { CONTEXT_PARAMS } from './model';
 })
 export abstract class CanvasBackgroundDirective {
 
-  private _elementRef: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
-  private _canvas!: HTMLCanvasElement;
-  private _webGL2RenderingContext!: WebGL2RenderingContext;
+  protected _canvas!: HTMLCanvasElement;
+  protected _webGL2RenderingContext!: WebGL2RenderingContext;
+  protected _elementRef: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
 
   protected get _renderingContext(): WebGL2RenderingContext {
     return this._webGL2RenderingContext;

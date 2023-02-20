@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { SmokeBackgroundMouseMoveDirective } from '../common/fluidBackground/followMouse/smoke/directive';
+import { FluidBackgroundCircleDirective } from '../common/fluidBackground/circle/directive.base';
 
 @Component({
   standalone: true,
   imports: [ CommonModule ],
-  hostDirectives: [ SmokeBackgroundMouseMoveDirective ],
+  hostDirectives: [ FluidBackgroundCircleDirective ],
+  // hostDirectives: [ SmokeBackgroundMouseMoveDirective ],
   selector: 'app-root',
   templateUrl: './component.html',
   styleUrls: ['./component.scss']

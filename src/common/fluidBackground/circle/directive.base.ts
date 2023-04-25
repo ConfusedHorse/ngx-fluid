@@ -68,7 +68,7 @@ export /*abstract*/ class FluidBackgroundCircleDirective extends FluidBackground
   }
 
   private _splatCircle(amount: number, radius: number, delta: number): void {
-    const circlePoints = this._getCirclePoints(amount, radius);
+    const circlePoints = this._getCirclePoints(amount, radius, delta);
 
     circlePoints.forEach(({ x, y, deltaX, deltaY }) => {
       this._fluidService.splat(x, y, deltaX, deltaY, this._color);
@@ -77,7 +77,7 @@ export /*abstract*/ class FluidBackgroundCircleDirective extends FluidBackground
 
   private _getColor(level: number): Rgb {
     // return rgb(level, 0, (255 - level));
-    return level > 63 ? rgb(0, 0, 127) : rgb(0, 0, 0);
+    return level > 63 ? rgb(0, 0, 63) : rgb(0, 0, 0);
   }
 
   private _getCirclePoints(amount: number, radius: number, delta: number = 250): ReadonlyArray<TexMovement> {

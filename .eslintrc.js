@@ -1,15 +1,24 @@
-module.exports =  {
+module.exports = {
   root: true,
-  ignorePatterns: ['**/version.ts'],
+  parserOptions: {
+    ecmaVersion: 13
+  },
+  ignorePatterns: ['/**/*.spec.ts', './artifacts/**/*', 'projects/**/*', '**/*.stories.ts', '**/version.ts', '**/jest.*.ts'],
   overrides: [{
     files: ['*.ts'],
     parserOptions: {
       project: ['tsconfig.json'],
       createDefaultProgram: true
     },
-    extends: ['plugin:@angular-eslint/ng-cli-compat', 'plugin:@angular-eslint/ng-cli-compat--formatting-add-on', 'plugin:@angular-eslint/template/process-inline-templates'],
+    extends: [
+      'plugin:@angular-eslint/recommended',
+      'plugin:@typescript-eslint/recommended',
+      'plugin:@angular-eslint/template/process-inline-templates'
+    ],
     rules: {
-      'space-before-blocks': "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/naming-convention': ['error', {
         selector: 'default',
         format: ['camelCase'],
@@ -18,56 +27,56 @@ module.exports =  {
           match: false
         }
       }, {
-        selector: 'variable',
-        modifiers: ['exported', 'const'],
-        format: ['UPPER_CASE', 'PascalCase']
-      }, {
-        selector: 'classProperty',
-        modifiers: ['static', 'readonly'],
-        format: ['UPPER_CASE', 'PascalCase'],
-        leadingUnderscore: 'allow'
-      }, {
-        selector: ['typeLike', 'enumMember'],
-        format: ['PascalCase']
-      }, {
-        selector: 'memberLike',
-        'modifiers': ['private'],
-        'format': ['camelCase'],
-        leadingUnderscore: 'require'
-      }, {
-        selector: 'memberLike',
-        modifiers: ['protected'],
-        format: ['camelCase'],
-        leadingUnderscore: 'require'
-      }, {
-        selector: 'memberLike',
-        modifiers: ['static'],
-        format: ['PascalCase'],
-        filter: {
-          regex: '^forRoot$|^forChild$',
-          match: false
-        }
-      }, {
-        selector: 'variable',
-        modifiers: ['destructured'],
-        format: null
-      }, {
-        selector: 'objectLiteralProperty',
-        'modifiers': ['requiresQuotes'],
-        format: null
-      }, {
-        selector: 'function',
-        format: ['camelCase'],
-        leadingUnderscore: 'require'
-      }, {
-        selector: 'function',
-        modifiers: ['exported'],
-        format: ['camelCase'],
-        leadingUnderscore: 'forbid'
-      }],
+          selector: 'variable',
+          modifiers: ['exported', 'const'],
+          format: ['UPPER_CASE', 'PascalCase']
+        }, {
+          selector: 'classProperty',
+          modifiers: ['static', 'readonly'],
+          format: ['UPPER_CASE', 'PascalCase'],
+          leadingUnderscore: 'allow'
+        }, {
+          selector: ['typeLike', 'enumMember'],
+          format: ['PascalCase']
+        }, {
+          selector: 'memberLike',
+          'modifiers': ['private'],
+          'format': ['camelCase'],
+          leadingUnderscore: 'require'
+        }, {
+          selector: 'memberLike',
+          modifiers: ['protected'],
+          format: ['camelCase'],
+          leadingUnderscore: 'require'
+        }, {
+          selector: 'memberLike',
+          modifiers: ['static'],
+          format: ['PascalCase'],
+          filter: {
+            regex: '^forRoot$|^forChild$',
+            match: false
+          }
+        }, {
+          selector: 'variable',
+          modifiers: ['destructured'],
+          format: null
+        }, {
+          selector: 'objectLiteralProperty',
+          'modifiers': ['requiresQuotes'],
+          format: null
+        }, {
+          selector: 'function',
+          format: ['camelCase'],
+          leadingUnderscore: 'require'
+        }, {
+          selector: 'function',
+          modifiers: ['exported'],
+          format: ['camelCase'],
+          leadingUnderscore: 'forbid'
+        }],
       '@typescript-eslint/member-ordering': ['error', {
         default: {
-          memberTypes: ['static-field', 'private-abstract-field', 'protected-abstract-field', 'public-abstract-field', 'private-instance-field', 'protected-instance-field', 'public-instance-field', 'constructor', 'public-method', 'protected-method', 'private-method']
+          memberTypes: ['static-field', 'protected-abstract-field', 'public-abstract-field', 'private-instance-field', 'protected-instance-field', 'public-instance-field', 'constructor', 'public-method', 'protected-method', 'private-method']
         }
       }],
       '@angular-eslint/component-selector': ['error', {

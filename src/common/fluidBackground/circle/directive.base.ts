@@ -51,7 +51,7 @@ export /*abstract*/ class FluidBackgroundCircleDirective extends FluidBackground
     const levels = new Uint8Array(bufferLength);
 
     interval(17).pipe(
-      tap(_ => {
+      tap(() => {
         analyser.getByteFrequencyData(levels);
         this._splatLevelCircle(bands, .1, levels);
       })

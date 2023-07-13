@@ -89,24 +89,6 @@ export const COLOR_SHADER_SOURCE = `
   }
 `;
 
-export const CHECKERBOARD_SHADER_SOURCE = `
-  precision highp float;
-  precision highp sampler2D;
-
-  varying vec2 vUv;
-  uniform sampler2D uTexture;
-  uniform float aspectRatio;
-
-  #define SCALE 25.0
-
-  void main () {
-    vec2 uv = floor(vUv * SCALE * vec2(aspectRatio, 1.0));
-    float v = mod(uv.x + uv.y, 2.0);
-    v = v * 0.1 + 0.8;
-    gl_FragColor = vec4(vec3(v), 1.0);
-  }
-`;
-
 export const DISPLAY_SHADER_SOURCE = `
   precision highp float;
   precision highp sampler2D;
@@ -466,7 +448,7 @@ export const GRADIENT_SUBTRACT_SHADER_SOURCE = `
     float T = texture2D(uPressure, vT).x;
     float B = texture2D(uPressure, vB).x;
     vec2 velocity = texture2D(uVelocity, vUv).xy;
-    velocity.xy -= vec2(R - L, T - B);
+    velocity.xy -= vec2(R - L, T - B) * 0.5;
     gl_FragColor = vec4(velocity, 0.0, 1.0);
   }
 `;

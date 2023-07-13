@@ -7,7 +7,6 @@ import {
   BLOOM_PREFILTER_SHADER_SOURCE,
   BLUR_SHADER_SOURCE,
   BLUR_VERTEX_SHADER_SOURCE,
-  CHECKERBOARD_SHADER_SOURCE,
   CLEAR_SHADER_SOURCE,
   COLOR_SHADER_SOURCE,
   COPY_SHADER_SOURCE,
@@ -29,7 +28,6 @@ export function compileShaders(renderingContext: WebGL2RenderingContext): Compil
     copyShader: copyShader(renderingContext),
     clearShader: clearShader(renderingContext),
     colorShader: colorShader(renderingContext),
-    checkerboardShader: checkerboardShader(renderingContext),
     bloomPrefilterShader: bloomPrefilterShader(renderingContext),
     bloomBlurShader: bloomBlurShader(renderingContext),
     bloomFinalShader: bloomFinalShader(renderingContext),
@@ -79,12 +77,6 @@ const colorShader = (renderingContext: WebGL2RenderingContext): WebGLShader => c
   renderingContext,
   renderingContext.FRAGMENT_SHADER,
   COLOR_SHADER_SOURCE
-);
-
-const checkerboardShader = (renderingContext: WebGL2RenderingContext): WebGLShader => compileShader(
-  renderingContext,
-  renderingContext.FRAGMENT_SHADER,
-  CHECKERBOARD_SHADER_SOURCE
 );
 
 const bloomPrefilterShader = (renderingContext: WebGL2RenderingContext): WebGLShader => compileShader(

@@ -259,10 +259,6 @@ export class FluidService {
       this._drawColor(target, normalizeColor(this._configuration.backColor));
     }
 
-    if (target === null && this._configuration.transparent) {
-      // this._drawCheckerboard(target); // meh?
-    }
-
     this._drawDisplay(target);
   }
 
@@ -358,16 +354,6 @@ export class FluidService {
 
     colorProgram.bind();
     this._renderingContext.uniform4f(colorProgram.uniforms['color'], color.r, color.g, color.b, 1);
-
-    this._blitFramebuffer(target);
-  }
-
-  private _drawCheckerboard(target: FrameBufferEntity | null): void {
-    const { checkerboardProgram } = this._programs;
-    const { canvas } = this;
-
-    checkerboardProgram.bind();
-    this._renderingContext.uniform1f(checkerboardProgram.uniforms['aspectRatio'], canvas.width / canvas.height);
 
     this._blitFramebuffer(target);
   }

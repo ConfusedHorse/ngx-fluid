@@ -5,7 +5,6 @@ export interface CompiledShaders {
   copyShader: WebGLShader;
   clearShader: WebGLShader;
   colorShader: WebGLShader;
-  checkerboardShader: WebGLShader;
   bloomPrefilterShader: WebGLShader;
   bloomBlurShader: WebGLShader;
   bloomFinalShader: WebGLShader;

@@ -5,7 +5,6 @@ export interface Programs {
   copyProgram: ProgramEntity;
   clearProgram: ProgramEntity;
   colorProgram: ProgramEntity;
-  checkerboardProgram: ProgramEntity;
   bloomPrefilterProgram: ProgramEntity;
   bloomBlurProgram: ProgramEntity;
   bloomFinalProgram: ProgramEntity;

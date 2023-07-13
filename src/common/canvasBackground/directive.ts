@@ -15,11 +15,11 @@ export abstract class CanvasBackgroundDirective {
   }
 
   constructor() {
-    this._appendCanvas();
-    this._initializeContext();
+    this.#appendCanvas();
+    this.#initializeContext();
   }
 
-  private _appendCanvas(): void {
+  #appendCanvas(): void {
     this._canvas = document.createElement('canvas');
 
     this._canvas.style.setProperty('position', 'absolute');
@@ -33,7 +33,7 @@ export abstract class CanvasBackgroundDirective {
   /**
    * assuming webgl2 because I am lazy
    */
-  private _initializeContext() {
+  #initializeContext() {
     this._webGL2RenderingContext = this._canvas.getContext('webgl2', CONTEXT_PARAMS) as WebGL2RenderingContext;
     this._webGL2RenderingContext.getExtension('EXT_color_buffer_float');
     this._webGL2RenderingContext.clearColor(0, 0, 0, 1);

@@ -25,7 +25,7 @@ export /*abstract*/ class FluidBackgroundCircleDirective extends FluidBackground
 
   ngOnInit(): void {
 
-    this._test();
+    this.#test();
 
     // fromEvent<MouseEvent>(this._elementRef.nativeElement, 'click').pipe(
     //   startWith(true),
@@ -36,7 +36,7 @@ export /*abstract*/ class FluidBackgroundCircleDirective extends FluidBackground
     // ).subscribe();
   }
 
-  private async _test() {
+  async #test() {
     const bands = 16;
     const audioContext = new AudioContext();
 
@@ -53,34 +53,34 @@ export /*abstract*/ class FluidBackgroundCircleDirective extends FluidBackground
     interval(17).pipe(
       tap(() => {
         analyser.getByteFrequencyData(levels);
-        this._splatLevelCircle(bands, .1, levels);
+        this.#splatLevelCircle(bands, .1, levels);
       })
     ).subscribe();
   }
 
-  private _splatLevelCircle(amount: number, radius: number, levels: Uint8Array): void {
+  #splatLevelCircle(amount: number, radius: number, levels: Uint8Array): void {
     const average = levels.reduce((avg, v, __, a) => (avg + v / a.length), 0);
-    const circlePoints = this._getCirclePoints(amount, radius, average);
+    const circlePoints = this.#getCirclePoints(amount, radius, average);
 
     circlePoints.forEach(({ x, y, deltaX, deltaY }, i) => {
-      this._fluidService.splat(x, y, deltaX, deltaY, this._getColor(levels[i]));
+      this._fluidService.splat(x, y, deltaX, deltaY, this.#getColor(levels[i]));
     });
   }
 
-  private _splatCircle(amount: number, radius: number, delta: number): void {
-    const circlePoints = this._getCirclePoints(amount, radius, delta);
+  // #splatCircle(amount: number, radius: number, delta: number): void {
+  //   const circlePoints = this.#getCirclePoints(amount, radius, delta);
 
-    circlePoints.forEach(({ x, y, deltaX, deltaY }) => {
-      this._fluidService.splat(x, y, deltaX, deltaY, this._color);
-    });
-  }
+  //   circlePoints.forEach(({ x, y, deltaX, deltaY }) => {
+  //     this._fluidService.splat(x, y, deltaX, deltaY, this._color);
+  //   });
+  // }
 
-  private _getColor(level: number): Rgb {
+  #getColor(level: number): Rgb {
     // return rgb(level, 0, (255 - level));
     return level > 63 ? rgb(0, 0, 63) : rgb(0, 0, 0);
   }
 
-  private _getCirclePoints(amount: number, radius: number, delta: number = 250): ReadonlyArray<TexMovement> {
+  #getCirclePoints(amount: number, radius: number, delta: number = 250): ReadonlyArray<TexMovement> {
     const { clientWidth, clientHeight } = this._fluidService.canvas as HTMLCanvasElement;
     const deltaRadius = radius + delta;
     const angleStep = (2 * Math.PI) / amount;

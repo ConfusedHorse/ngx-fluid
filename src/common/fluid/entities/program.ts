@@ -4,20 +4,20 @@ import { UniformsIndex } from '../model/uniforms';
 
 export class ProgramEntity {
 
-  private _program!: WebGLProgram;
-  private _uniforms!: UniformsIndex;
+  #program: WebGLProgram;
+  #uniforms: UniformsIndex;
 
   public get program(): WebGLProgram {
-    return this._program;
+    return this.#program;
   }
 
   public get uniforms(): UniformsIndex {
-    return this._uniforms;
+    return this.#uniforms;
   }
 
   constructor(private _renderingContext: WebGL2RenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
-    this._program = createProgram(_renderingContext, vertexShader, fragmentShader);
-    this._uniforms = getUniforms(_renderingContext, this._program);
+    this.#program = createProgram(_renderingContext, vertexShader, fragmentShader);
+    this.#uniforms = getUniforms(_renderingContext, this.#program);
   }
 
   public bind(): void {

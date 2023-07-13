@@ -6,23 +6,26 @@ import { DISPLAY_SHADER_SOURCE } from '../shaders/sources';
 
 export class MaterialEntity {
 
-  private _programs: WebGLProgram[] = [];
-  private _activeProgram!: WebGLProgram;
-  private _uniforms!: UniformsIndex;
+  #programs: WebGLProgram[] = [];
+  #activeProgram!: WebGLProgram;
+  #uniforms!: UniformsIndex;
 
   public get uniforms(): UniformsIndex {
-    return this._uniforms;
+    return this.#uniforms;
   }
 
-  constructor(private _renderingContext: WebGL2RenderingContext, private _vertexShader: WebGLShader) { }
+  constructor(
+    private _renderingContext: WebGL2RenderingContext,
+    private _vertexShader: WebGLShader
+  ) { }
 
   public setKeywords(keywords: ReadonlyArray<string>): void {
     let hash = 0;
     for(const keyword of keywords) {
-      hash += this._hashCode(keyword);
+      hash += this.#hashCode(keyword);
     }
 
-    let program = this._programs[hash];
+    let program = this.#programs[hash];
     if (!program) {
       const fragmentShader = compileShader(
         this._renderingContext,
@@ -32,22 +35,22 @@ export class MaterialEntity {
       );
 
       program = createProgram(this._renderingContext, this._vertexShader, fragmentShader);
-      this._programs[hash] = program;
+      this.#programs[hash] = program;
     }
 
-    if (program === this._activeProgram) {
+    if (program === this.#activeProgram) {
       return;
     }
 
-    this._uniforms = getUniforms(this._renderingContext, program);
-    this._activeProgram = program;
+    this.#uniforms = getUniforms(this._renderingContext, program);
+    this.#activeProgram = program;
   }
 
   public bind(): void {
-    this._renderingContext.useProgram(this._activeProgram);
+    this._renderingContext.useProgram(this.#activeProgram);
   }
 
-  private _hashCode(keyword: string): number {
+  #hashCode(keyword: string): number {
     if (keyword.length === 0) {
       return 0;
     }

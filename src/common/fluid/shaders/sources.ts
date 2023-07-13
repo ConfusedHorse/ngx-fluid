@@ -342,10 +342,10 @@ export const DIVERGENCE_SHADER_SOURCE = `
     float B = texture2D(uVelocity, vB).y;
 
     vec2 C = texture2D(uVelocity, vUv).xy;
-    if (vL.x < 0.0) { L = -C.x; }
-    if (vR.x > 1.0) { R = -C.x; }
-    if (vT.y > 1.0) { T = -C.y; }
-    if (vB.y < 0.0) { B = -C.y; }
+    if (vL.x < 0.0 || vL.x > 0.25 && vL.x < 0.75 && vL.y > 0.25 && vL.y < 0.75) { L = -C.x; }
+    if (vR.x > 1.0 || vR.x > 0.25 && vR.x < 0.75 && vR.y > 0.25 && vR.y < 0.75) { R = -C.x; }
+    if (vT.y > 1.0 || vT.x > 0.25 && vT.x < 0.75 && vT.y > 0.25 && vT.y < 0.75) { T = -C.y; }
+    if (vB.y < 0.0 || vB.x > 0.25 && vB.x < 0.75 && vB.y > 0.25 && vB.y < 0.75) { B = -C.y; }
 
     float div = 0.5 * (R - L + T - B);
     gl_FragColor = vec4(div, 0.0, 0.0, 1.0);

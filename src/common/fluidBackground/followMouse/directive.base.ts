@@ -4,10 +4,14 @@ import { asyncScheduler, fromEvent, tap, throttleTime } from 'rxjs';
 import { rgb } from '../../fluid/helpers/color';
 import toTexMovement from '../../fluid/helpers/pipes/toTexMovement';
 import { Rgb } from '../../fluid/model/color';
+import { FluidService } from '../../fluid/service';
 import { FluidBackgroundDirective } from '../directive.base';
 
 @Directive({
-  standalone: true
+  standalone: true,
+  providers: [
+    FluidService
+  ]
 })
 export class FluidBackgroundMouseMoveDirective extends FluidBackgroundDirective implements OnInit {
 

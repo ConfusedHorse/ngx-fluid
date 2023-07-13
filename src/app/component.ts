@@ -7,6 +7,7 @@ import { SmokeBackgroundMouseMoveDirective } from '../common/fluidBackground/fol
   imports: [ CommonModule ],
   // hostDirectives: [ FluidBackgroundCircleDirective ],
   hostDirectives: [ SmokeBackgroundMouseMoveDirective ],
+  // hostDirectives: [ FluidBackgroundMouseMoveDirective ],
   selector: 'app-root',
   templateUrl: './component.html',
   styleUrls: ['./component.scss']
